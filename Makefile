@@ -10,9 +10,12 @@ LIB_LOCAL_D	:=
 EXECUTABLE 	 := main
 EXECUTABLE_D := main_d
 
+OBJS=$(SRC:.cpp=.o)
+OBJS_D=$(SRC:.cpp=_d.o)
+
 #CCOPT = -O2 -pthread -qrtti -qtempinc -qstaticinline 
 #CCOPT_D = -g -pthread -qrtti -qtempinc -qstaticinline 
-CCOPT = $(CXX_FLAGS) -fPIC
+CCOPT = $(CXX_FLAGS) -O2 -fPIC
 CCOPT_D = $(CXX_FLAGS) -ggdb -fPIC
 
 
@@ -20,6 +23,10 @@ MPLDEFS = -D__NUMBER_FIELD_ID__ -DSYSV_SEM -DCOM_GNU
 MPLDEFS_D = -D__NUMBER_FIELD_ID__ -DSYSV_SEM -DCOM_GNU -D_DEBUG -DDEBUG_TRACE -DDEBUG_LEVEL_FATAL -DDEBUG_LEVEL_1 \
                        -DDEBUG_LEVEL_2 -DDEBUG_LEVEL_3 -DDEBUG_LEVEL_4 -DDEBUG_LEVEL_5 \
                        -DDEBUG_LEVEL_6 
+
+
+CFLAGS   = $(CCOPT) $(MPLDEFS)
+CFLAGS_D = $(CCOPT_D) $(MPLDEFS_D)
 
 
 BOOST_INCLUDE := "C:\boost\include\boost-1_87"
@@ -42,21 +49,12 @@ clean:
 	-rm $(BIN)/*
 
 $(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
-	$(CXX) $(CCOPT) -I$(BOOST_INCLUDE) -I$(INCLUDE) $^ -o $@ -L$(BOOST_LIB) $(LIB_LOCAL) $(BOOST_EXTLIB)
+	$(CXX) $(CFLAGS) -I$(BOOST_INCLUDE) -I$(INCLUDE) $^ -o $@ -L$(BOOST_LIB) $(LIB_LOCAL) $(BOOST_EXTLIB)
 
 $(BIN)/$(EXECUTABLE_D): $(SRC)/*.cpp
-	$(CXX) $(CCOPT_D) -I$(BOOST_INCLUDE) -I$(INCLUDE) $^ -o $@ -L$(BOOST_LIB) $(LIB_LOCAL_D) $(BOOST_EXTLIB_D)
+	$(CXX) $(CFLAGS_D) -I$(BOOST_INCLUDE) -I$(INCLUDE) $^ -o $@ -L$(BOOST_LIB) $(LIB_LOCAL_D) $(BOOST_EXTLIB_D)
 
 
 debug: $(BIN)/$(EXECUTABLE_D)
 release: $(BIN)/$(EXECUTABLE)
 all: clean debug release
-
-
-#run: clean all
-#	clear
-#	./$(BIN)/$(EXECUTABLE)
-
-#$(BIN)/$(EXECUTABLE): $(SRC)/*.cpp
-#	$(CXX) $(CCOPT_D) -I$(BOOST_INCLUDE) -I$(INCLUDE) $^ -o $@ -L$(BOOST_LIB) $(LIBRARIES) $(BOOST_EXTLIB)
-
